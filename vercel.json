@@ -1,7 +1,8 @@
 {
   "version": 2,
+  "buildCommand": "mkdir -p public && cp index-v2.html public/index.html && cp -r docs public/ && cp design-system.css public/",
+  "outputDirectory": "public",
   "rewrites": [
-    { "source": "/", "destination": "/docs-viewer.html" },
     { "source": "/api/files", "destination": "/api/file.js" }
   ],
   "headers": [

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnButter 문서 아카이브</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* 사이드바 */
+    .sidebar {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .sidebar h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #667eea;
+    }
+
+    .category {
+      margin-bottom: 20px;
+    }
+
+    .category-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .category-title:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .file-list {
+      list-style: none;
+      padding-left: 16px;
+      display: none;
+    }
+
+    .file-list.expanded {
+      display: block;
+    }
+
+    .file-item {
+      padding: 6px 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #555;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+    }
+
+    .file-item:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+
+    .file-item.active {
+      background: #667eea;
+      color: white;
+    }
+
+    /* 메인 컨텐츠 */
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .content-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .markdown-body {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+
+    .empty-state h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #667eea;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 300px;
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+
+      .content-wrapper {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h1>🧈 UnButter Docs</h1>
+    <div id="file-tree"></div>
+  </div>
+
+  <div class="main-content">
+    <div class="content-wrapper">
+      <div id="content">
+        <div class="empty-state">
+          <h2>환영합니다</h2>
+          <p>왼쪽 사이드바에서 문서를 선택해주세요</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DOCS_API = '/api/file.js';
+    let fileStructure = {};
+
+    // 파일 구조 로드
+    async function loadFileStructure() {
+      try {
+        const response = await fetch(DOCS_API);
+        const files = await response.json();
+        
+        // 카테고리별로 정리
+        files.forEach(file => {
+          const parts = file.split('/');
+          const category = parts[1]; // docs/category/...
+          
+          if (!fileStructure[category]) {
+            fileStructure[category] = [];
+          }
+          
+          fileStructure[category].push(file);
+        });
+
+        renderFileTree();
+      } catch (err) {
+        console.error('파일 구조 로드 실패:', err);
+      }
+    }
+
+    // 파일 트리 렌더링
+    function renderFileTree() {
+      const treeContainer = document.getElementById('file-tree');
+      
+      Object.entries(fileStructure).forEach(([category, files]) => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'category';
+        
+        const categoryTitle = document.createElement('div');
+        categoryTitle.className = 'category-title';
+        categoryTitle.textContent = `📁 ${category}`;
+        categoryTitle.onclick = () => {
+          fileList.classList.toggle('expanded');
+        };
+        
+        const fileList = document.createElement('ul');
+        fileList.className = 'file-list';
+        
+        files.forEach(file => {
+          const fileName = file.split('/').pop();
+          const li = document.createElement('li');
+          li.className = 'file-item';
+          li.textContent = fileName;
+          li.onclick = () => loadDocument(file);
+          fileList.appendChild(li);
+        });
+        
+        categoryDiv.appendChild(categoryTitle);
+        categoryDiv.appendChild(fileList);
+        treeContainer.appendChild(categoryDiv);
+      });
+    }
+
+    // 문서 로드
+    async function loadDocument(filePath) {
+      try {
+        const response = await fetch(`/${filePath}`);
+        const markdown = await response.text();
+        
+        // Markdown → HTML
+        const html = marked.parse(markdown);
+        
+        // 렌더링
+        const contentDiv = document.getElementById('content');
+        contentDiv.innerHTML = `<div class="markdown-body">${html}</div>`;
+        
+        // 활성 파일 표시
+        document.querySelectorAll('.file-item').forEach(item => {
+          item.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // 스크롤 최상단
+        document.querySelector('.main-content').scrollTop = 0;
+      } catch (err) {
+        console.error('문서 로드 실패:', err);
+        document.getElementById('content').innerHTML = `
+          <div class="empty-state">
+            <h2>⚠️ 로드 실패</h2>
+            <p>${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // 초기화
+    loadFileStructure();
+  </script>
+</body>
+</html>

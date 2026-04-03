@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>언버터 리포트 | 프로젝트 아카이브</title>
+  <title>언버터 리포트 | 프로젝트 아카이브 v2</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -37,6 +38,15 @@
       display: flex;
       align-items: center;
       gap: 1rem;
+    }
+    
+    .version-badge {
+      font-size: 0.75rem;
+      background: #43302e;
+      color: #fff1b5;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-weight: bold;
     }
     
     .total-count {
@@ -150,6 +160,7 @@
       background: #f9fafb;
       border-radius: 0.5rem;
       transition: all 0.3s;
+      cursor: pointer;
     }
     
     .doc-item:hover {
@@ -210,12 +221,203 @@
       font-size: 4rem;
       margin-bottom: 1rem;
     }
+    
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      animation: fadeIn 0.2s;
+    }
+    
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 1rem;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s;
+    }
+    
+    .modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid #f3f4f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #43302e;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      color: #6b7280;
+      transition: color 0.2s;
+    }
+    
+    .modal-close:hover {
+      color: #43302e;
+    }
+    
+    .modal-body {
+      padding: 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .modal-loading {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #6b7280;
+    }
+    
+    .modal-error {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #dc2626;
+    }
+    
+    /* Markdown 렌더링 스타일 */
+    .markdown-content {
+      line-height: 1.8;
+      color: #1f2937;
+    }
+    
+    .markdown-content h1 {
+      font-size: 2rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #43302e;
+      border-bottom: 2px solid #fff1b5;
+      padding-bottom: 0.5rem;
+    }
+    
+    .markdown-content h2 {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #43302e;
+    }
+    
+    .markdown-content h3 {
+      font-size: 1.25rem;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: #43302e;
+    }
+    
+    .markdown-content p {
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content ul, .markdown-content ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .markdown-content code {
+      background: #f3f4f6;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.875em;
+    }
+    
+    .markdown-content pre {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+    
+    .markdown-content blockquote {
+      border-left: 4px solid #fff1b5;
+      padding-left: 1rem;
+      margin-left: 0;
+      margin-bottom: 1rem;
+      color: #6b7280;
+    }
+    
+    .markdown-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    
+    .markdown-content th,
+    .markdown-content td {
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    
+    .markdown-content th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="header-content">
-      <h1>🧈 언버터 리포트</h1>
+      <h1>
+        🧈 언버터 리포트
+        <span class="version-badge">v2.0</span>
+      </h1>
       <div style="text-align: right;">
         <div class="total-count" id="totalCount">11</div>
         <div class="total-label">전체 문서</div>
@@ -232,6 +434,24 @@
         <input type="text" class="search-box" id="searchBox" placeholder="🔍 문서 검색...">
       </div>
       <div class="doc-list" id="docList"></div>
+    </div>
+  </div>
+
+  <!-- 문서 보기 모달 -->
+  <div class="modal" id="docModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">
+          📄 문서 로딩 중...
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div class="modal-loading">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+          <div>문서를 불러오는 중...</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -381,7 +601,7 @@
       container.innerHTML = docs.map(doc => {
         const cat = categories.find(c => c.id === doc.category);
         return `
-          <div class="doc-item" style="border-left-color: ${cat.color}">
+          <div class="doc-item" style="border-left-color: ${cat.color}" onclick="openDoc(${doc.id})">
             <div class="doc-title">${cat.icon} ${doc.title}</div>
             <div class="doc-meta">
               <span>📅 ${doc.date}</span>
@@ -389,7 +609,7 @@
               <span>📂 ${cat.name}</span>
             </div>
             <div class="doc-desc">${doc.desc}</div>
-            <a href="#" class="doc-link" onclick="openDoc('${doc.path}'); return false;">📄 문서 보기 →</a>
+            <a href="#" class="doc-link" onclick="event.stopPropagation(); openDoc(${doc.id}); return false;">📄 문서 보기 →</a>
           </div>
         `;
       }).join('');
@@ -421,10 +641,80 @@
       renderDocuments(results);
     }
 
-    function openDoc(path) {
-      alert(`문서 경로: /Users/jeong-ing/.openclaw/workspace/${path}\n\n(파일 시스템 연동 예정)`);
+    async function openDoc(docId) {
+      const doc = documents.find(d => d.id === docId);
+      if (!doc) return;
+      
+      const modal = document.getElementById('docModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      
+      // 모달 열기
+      modal.classList.add('active');
+      
+      // 로딩 상태
+      const cat = categories.find(c => c.id === doc.category);
+      modalTitle.innerHTML = `${cat.icon} ${doc.title}`;
+      modalBody.innerHTML = `
+        <div class="modal-loading">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+          <div>문서를 불러오는 중...</div>
+        </div>
+      `;
+      
+      try {
+        // API 호출
+        const response = await fetch(`/api/file?path=${encodeURIComponent(doc.path)}`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.message || '파일을 불러올 수 없습니다');
+        }
+        
+        // Markdown 렌더링
+        const htmlContent = marked.parse(data.content);
+        modalBody.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
+        
+      } catch (error) {
+        console.error('Error loading document:', error);
+        modalBody.innerHTML = `
+          <div class="modal-error">
+            <div style="font-size: 2rem; margin-bottom: 1rem;">❌</div>
+            <div style="font-weight: bold; margin-bottom: 0.5rem;">문서를 불러올 수 없습니다</div>
+            <div style="font-size: 0.875rem; color: #6b7280;">${error.message}</div>
+            <div style="margin-top: 1.5rem; font-size: 0.875rem; color: #6b7280;">
+              경로: ${doc.path}
+            </div>
+          </div>
+        `;
+      }
     }
 
+    function closeModal() {
+      const modal = document.getElementById('docModal');
+      modal.classList.remove('active');
+    }
+
+    // ESC 키로 모달 닫기
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // 모달 배경 클릭 시 닫기
+    document.getElementById('docModal').addEventListener('click', (e) => {
+      if (e.target.id === 'docModal') {
+        closeModal();
+      }
+    });
+
+    // 검색 기능
     document.getElementById('searchBox').addEventListener('input', (e) => {
       searchDocuments(e.target.value);
     });

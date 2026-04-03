@@ -1,24 +1,17 @@
-# 언버터 리포트
+# UnButter 문서 아카이브
 
-## GitHub Pages 활성화
+마지막 업데이트: 2026. 4. 3. 오후 10:20:29
 
-1. https://github.com/iamunbutter/unbutter-reports/settings/pages 접속
-2. Source: `Deploy from a branch`
-3. Branch: `main` / `/ (root)`
-4. Save
+## 📚 카테고리
 
-배포 URL: https://iamunbutter.github.io/unbutter-reports/
+- [agents](./docs/agents) - 16개 문서
+- [brand](./docs/brand) - 9개 문서
+- [extensions](./docs/extensions) - 3개 문서
+- [current](./docs/current) - 4개 문서
+- [dashboard](./docs/dashboard) - 3개 문서
+- [marketing](./docs/marketing) - 8개 문서
+- [reports](./docs/reports) - 0개 문서
 
-## 로컬 빌드
+---
 
-```bash
-node build-docs-json.js
-cp index-v2.html index.html
-```
-
-## 자동 동기화
-
-매일 오전 9시 자동 실행:
-```bash
-node /Users/jeong-ing/.openclaw/workspace/unbutter-agents/butterbot-auto.js daily
-```
+이 문서는 자동으로 생성되었습니다.

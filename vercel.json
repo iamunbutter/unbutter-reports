@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "functions": {
-    "api/*.js": {
-      "includeFiles": "docs/**"
+  "buildCommand": "node build-docs-json.js",
+  "outputDirectory": "public",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index-v2.html"
     }
-  }
+  ]
 }

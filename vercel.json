@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "node build-docs-json.js",
-  "outputDirectory": "public",
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index-v2.html"
-    }
-  ]
+  "buildCommand": "npm run build",
+  "outputDirectory": "public"
 }

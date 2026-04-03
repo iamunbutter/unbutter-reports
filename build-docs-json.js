@@ -29,19 +29,8 @@ function walkDir(dir, baseCategory = '') {
 
 walkDir(docsDir);
 
-// public 폴더 생성
-const publicDir = path.join(__dirname, 'public');
-if (!fs.existsSync(publicDir)) {
-  fs.mkdirSync(publicDir);
-}
-
-// docs.json 저장
-const outputPath = path.join(publicDir, 'docs.json');
+// 루트에 docs.json 저장
+const outputPath = path.join(__dirname, 'docs.json');
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
-
-// index.html 복사
-const indexSrc = path.join(__dirname, 'index-v2.html');
-const indexDest = path.join(publicDir, 'index.html');
-fs.copyFileSync(indexSrc, indexDest);
 
 console.log(`✅ ${Object.keys(output).length}개 문서를 docs.json으로 빌드했습니다.`);

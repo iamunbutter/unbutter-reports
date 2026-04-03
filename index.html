@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>언버터 리포트 | 프로젝트 아카이브</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f9fafb;
+      color: #1f2937;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #fff9e6 0%, #fff1b5 100%);
+      border-bottom: 3px solid #43302e;
+      padding: 2rem;
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: #43302e;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .total-count {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #43302e;
+    }
+    
+    .total-label {
+      font-size: 1rem;
+      color: #6b7280;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .category-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .category-card.active {
+      box-shadow: 0 4px 16px rgba(67, 48, 46, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .category-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .category-count {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .documents {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .documents-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f3f4f6;
+    }
+    
+    .documents-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #43302e;
+    }
+    
+    .search-box {
+      padding: 0.5rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      width: 300px;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: #fff1b5;
+    }
+    
+    .doc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .doc-item {
+      border-left: 4px solid;
+      padding: 1.5rem;
+      background: #f9fafb;
+      border-radius: 0.5rem;
+      transition: all 0.3s;
+    }
+    
+    .doc-item:hover {
+      background: #f3f4f6;
+      transform: translateX(4px);
+    }
+    
+    .doc-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .doc-meta {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.75rem;
+    }
+    
+    .doc-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .doc-desc {
+      color: #4b5563;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+    
+    .doc-link {
+      display: inline-block;
+      margin-top: 0.75rem;
+      color: #43302e;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+    
+    .doc-link:hover {
+      text-decoration: underline;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #9ca3af;
+    }
+    
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h1>🧈 언버터 리포트</h1>
+      <div style="text-align: right;">
+        <div class="total-count" id="totalCount">11</div>
+        <div class="total-label">전체 문서</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="categories" id="categories"></div>
+    
+    <div class="documents">
+      <div class="documents-header">
+        <div class="documents-title" id="categoryTitle">전체 문서</div>
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 문서 검색...">
+      </div>
+      <div class="doc-list" id="docList"></div>
+    </div>
+  </div>
+
+  <script>
+    const categories = [
+      { id: 'all', name: '전체', icon: '📦', count: 11, color: '#9ca3af' },
+      { id: 'planning', name: '기획서', icon: '📋', count: 2, color: '#3b82f6' },
+      { id: 'architecture', name: '아키텍처', icon: '🏗️', count: 2, color: '#10b981' },
+      { id: 'design', name: '목업/디자인', icon: '🎨', count: 1, color: '#8b5cf6' },
+      { id: 'marketing', name: '마케팅', icon: '📢', count: 3, color: '#ec4899' },
+      { id: 'code', name: '코드', icon: '💻', count: 2, color: '#6366f1' },
+      { id: 'task', name: '태스크', icon: '✅', count: 1, color: '#f59e0b' },
+    ];
+
+    const documents = [
+      {
+        id: 1,
+        category: 'planning',
+        title: '언버터 에이전트 팀 구조 설계',
+        date: '2026-04-03',
+        author: '버터봇',
+        desc: '하네스 엔지니어링 기반 TASK-TEAM-LINK 체인 구조. 기획/개발/디자인 3개 팀, 병렬 작업 지원.',
+        path: 'AGENT-TEAM-STRUCTURE.md'
+      },
+      {
+        id: 2,
+        category: 'planning',
+        title: '블로그 자동화 기획서',
+        date: '2026-04-01',
+        author: '기획팀',
+        desc: '네이버 블로그 자동 발행 시스템. Playwright 자동화 → 크롬 확장으로 변경.',
+        path: 'unbutter-marketing/blog-automation-plan.md'
+      },
+      {
+        id: 3,
+        category: 'architecture',
+        title: '크롬 확장 프로그램 아키텍처',
+        date: '2026-04-03',
+        author: '개발팀',
+        desc: 'Manifest V3 기반 네이버 블로그 자동 작성 확장. Content script + Popup 구조.',
+        path: 'unbutter-chrome-extension/README.md'
+      },
+      {
+        id: 4,
+        category: 'architecture',
+        title: '대시보드 시스템 설계',
+        date: '2026-04-03',
+        author: '개발팀',
+        desc: '에이전트 상태 모니터링 + 문서 아카이브 대시보드. Next.js → 정적 HTML 전환.',
+        path: 'unbutter-dashboard-static/index.html'
+      },
+      {
+        id: 5,
+        category: 'marketing',
+        title: '언버터 브랜드 스토리',
+        date: '2026-04-01',
+        author: '기획팀',
+        desc: '언버터 탄생 배경, 브랜드 철학, 제품 개발 스토리. 블로그 1편 소재.',
+        path: 'unbutter-brand/core/story.md'
+      },
+      {
+        id: 6,
+        category: 'marketing',
+        title: '타겟 페르소나 정의서',
+        date: '2026-04-01',
+        author: '기획팀',
+        desc: '박서윤 (29세, IT 콘텐츠 디자이너). 루틴 중시, 세미 인플루언서.',
+        path: 'unbutter-brand/core/icp.md'
+      },
+      {
+        id: 7,
+        category: 'marketing',
+        title: '블로그 "언버터 탄생기" 최종본',
+        date: '2026-04-02',
+        author: '에디터팀',
+        desc: '친근한 존댓말 톤, 버터팬 커뮤니티 언어 적용. 이미지 5장 가이드 포함.',
+        path: 'unbutter-marketing/content-library/blog/brand-story-final-v3.md'
+      },
+      {
+        id: 8,
+        category: 'code',
+        title: '네이버 블로그 퍼블리셔 v2',
+        date: '2026-04-02',
+        author: '개발팀',
+        desc: 'Playwright 기반 자동화. 세션 저장 + 자연스러운 타이핑. 봇 감지 회피.',
+        path: 'naver-blog-publisher-v2.js'
+      },
+      {
+        id: 9,
+        category: 'code',
+        title: '크롬 확장 Content Script',
+        date: '2026-04-03',
+        author: '개발팀',
+        desc: '네이버 블로그 DOM 조작. iframe/contenteditable 지원. 자연스러운 타이핑.',
+        path: 'unbutter-chrome-extension/content.js'
+      },
+      {
+        id: 10,
+        category: 'design',
+        title: '브랜드 컬러 시스템',
+        date: '2026-04-01',
+        author: '디자인팀',
+        desc: 'Soft Butter (#fff1b5), Cocoa Latte (#43302e). 베이커리 감성 컬러 팔레트.',
+        path: 'unbutter-brand/assets/colors.md'
+      },
+      {
+        id: 11,
+        category: 'task',
+        title: '집에서 할 일 체크리스트',
+        date: '2026-04-03',
+        author: '버터봇',
+        desc: '맥미니 설정, 네이버 세션 저장, 대시보드 확인, 텔레그램 승인 수정.',
+        path: 'HOME-TASKS.md'
+      },
+    ];
+
+    let currentCategory = 'all';
+    let filteredDocs = documents;
+
+    function renderCategories() {
+      const container = document.getElementById('categories');
+      container.innerHTML = categories.map(cat => `
+        <div class="category-card ${cat.id === currentCategory ? 'active' : ''}" 
+             style="border-left-color: ${cat.color}"
+             onclick="filterByCategory('${cat.id}')">
+          <div class="category-header">
+            <div class="category-name">${cat.icon} ${cat.name}</div>
+            <div class="category-count" style="color: ${cat.color}">${cat.count}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderDocuments(docs) {
+      const container = document.getElementById('docList');
+      
+      if (docs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div>문서가 없습니다</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = docs.map(doc => {
+        const cat = categories.find(c => c.id === doc.category);
+        return `
+          <div class="doc-item" style="border-left-color: ${cat.color}">
+            <div class="doc-title">${cat.icon} ${doc.title}</div>
+            <div class="doc-meta">
+              <span>📅 ${doc.date}</span>
+              <span>👤 ${doc.author}</span>
+              <span>📂 ${cat.name}</span>
+            </div>
+            <div class="doc-desc">${doc.desc}</div>
+            <a href="#" class="doc-link" onclick="openDoc('${doc.path}'); return false;">📄 문서 보기 →</a>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterByCategory(catId) {
+      currentCategory = catId;
+      
+      if (catId === 'all') {
+        filteredDocs = documents;
+      } else {
+        filteredDocs = documents.filter(doc => doc.category === catId);
+      }
+      
+      const cat = categories.find(c => c.id === catId);
+      document.getElementById('categoryTitle').textContent = cat.name;
+      
+      renderCategories();
+      renderDocuments(filteredDocs);
+    }
+
+    function searchDocuments(query) {
+      const lowerQuery = query.toLowerCase();
+      const results = documents.filter(doc =>
+        doc.title.toLowerCase().includes(lowerQuery) ||
+        doc.desc.toLowerCase().includes(lowerQuery) ||
+        doc.author.toLowerCase().includes(lowerQuery)
+      );
+      renderDocuments(results);
+    }
+
+    function openDoc(path) {
+      alert(`문서 경로: /Users/jeong-ing/.openclaw/workspace/${path}\n\n(파일 시스템 연동 예정)`);
+    }
+
+    document.getElementById('searchBox').addEventListener('input', (e) => {
+      searchDocuments(e.target.value);
+    });
+
+    // 초기 렌더링
+    renderCategories();
+    renderDocuments(filteredDocs);
+  </script>
+</body>
+</html>

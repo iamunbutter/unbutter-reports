@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 테스트 - 언버터 리포트</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #f9fafb;
+    }
+    
+    h1 {
+      color: #43302e;
+      margin-bottom: 2rem;
+    }
+    
+    .test-section {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.375rem;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    button {
+      background: #43302e;
+      color: #fff1b5;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.375rem;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.875rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    
+    .result.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    
+    .result.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+    
+    .quick-tests {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .quick-test-btn {
+      background: #f3f4f6;
+      color: #1f2937;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+    
+    .quick-test-btn:hover {
+      background: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧈 API 테스트 도구</h1>
+  
+  <div class="test-section">
+    <h2>파일 읽기 테스트</h2>
+    <label for="filePath">파일 경로 (워크스페이스 기준 상대 경로)</label>
+    <input 
+      type="text" 
+      id="filePath" 
+      placeholder="예: AGENT-TEAM-STRUCTURE.md"
+      value="AGENT-TEAM-STRUCTURE.md"
+    >
+    
+    <button onclick="testAPI()">📄 파일 읽기</button>
+    
+    <div class="quick-tests">
+      <button class="quick-test-btn" onclick="quickTest('AGENT-TEAM-STRUCTURE.md')">
+        📋 팀 구조 문서
+      </button>
+      <button class="quick-test-btn" onclick="quickTest('unbutter-brand/core/story.md')">
+        🎨 브랜드 스토리
+      </button>
+      <button class="quick-test-btn" onclick="quickTest('HOME-TASKS.md')">
+        ✅ 태스크 리스트
+      </button>
+      <button class="quick-test-btn" onclick="quickTest('invalid/../etc/passwd')">
+        🚫 보안 테스트 (실패해야 함)
+      </button>
+    </div>
+    
+    <div id="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>📊 테스트 결과 가이드</h2>
+    <ul style="line-height: 2; color: #4b5563;">
+      <li><strong>✅ 성공:</strong> JSON에 <code>success: true</code> + 파일 내용</li>
+      <li><strong>❌ 404:</strong> 파일을 찾을 수 없음</li>
+      <li><strong>🚫 403:</strong> 보안 검증 실패 (경로 순회, 확장자)</li>
+      <li><strong>⚠️ 500:</strong> 서버 오류 (권한 등)</li>
+    </ul>
+  </div>
+
+  <script>
+    async function testAPI() {
+      const filePath = document.getElementById('filePath').value.trim();
+      const resultDiv = document.getElementById('result');
+      
+      if (!filePath) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = '파일 경로를 입력하세요.';
+        return;
+      }
+      
+      resultDiv.className = 'result';
+      resultDiv.textContent = '⏳ 로딩 중...';
+      
+      try {
+        const url = `/api/file?path=${encodeURIComponent(filePath)}`;
+        console.log('Request URL:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          resultDiv.className = 'result success';
+          resultDiv.textContent = 
+            `✅ 성공!\n\n` +
+            `경로: ${data.path}\n` +
+            `크기: ${data.size} bytes\n\n` +
+            `내용 미리보기:\n${data.content.substring(0, 500)}${data.content.length > 500 ? '...' : ''}`;
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.textContent = 
+            `❌ 실패 (HTTP ${response.status})\n\n` +
+            `에러: ${data.error}\n` +
+            `메시지: ${data.message}`;
+        }
+        
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = 
+          `⚠️ 네트워크 오류\n\n` +
+          `${error.message}\n\n` +
+          `힌트: Vercel Dev 서버가 실행 중인지 확인하세요.\n` +
+          `실행 명령: npm run dev`;
+      }
+    }
+    
+    function quickTest(path) {
+      document.getElementById('filePath').value = path;
+      testAPI();
+    }
+    
+    // Enter 키로 테스트 실행
+    document.getElementById('filePath').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        testAPI();
+      }
+    });
+  </script>
+</body>
+</html>

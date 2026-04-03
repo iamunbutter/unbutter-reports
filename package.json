@@ -1,0 +1,17 @@
+{
+  "name": "unbutter-reports",
+  "version": "2.0.0",
+  "description": "UnButter 프로젝트 아카이브 대시보드",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static build complete'",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "marked": "^12.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}

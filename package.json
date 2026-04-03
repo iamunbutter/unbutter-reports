@@ -2,7 +2,7 @@
   "name": "unbutter-reports",
   "version": "2.0.0",
   "scripts": {
-    "build": "node build-docs-json.js && cp index-v2.html public/index.html"
+    "build": "node build-docs-json.js"
   },
   "dependencies": {
     "marked": "^12.0.0"

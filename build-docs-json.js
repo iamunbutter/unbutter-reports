@@ -29,9 +29,7 @@ function walkDir(dir, baseCategory = '') {
 
 walkDir(docsDir);
 
-fs.writeFileSync(
-  path.join(__dirname, 'public/docs.json'),
-  JSON.stringify(output, null, 2)
-);
+const outputPath = path.join(__dirname, 'docs.json');
+fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
 
 console.log(`✅ ${Object.keys(output).length}개 문서를 docs.json으로 빌드했습니다.`);

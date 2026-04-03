@@ -1,18 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "mkdir -p public && cp index-v2.html public/index.html && cp -r docs public/ && cp design-system.css public/",
-  "outputDirectory": "public",
-  "rewrites": [
-    { "source": "/api/files", "destination": "/api/file.js" }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-      ]
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "docs/**"
     }
-  ]
+  }
 }

@@ -1,3 +1,12 @@
 {
-  "buildCommand": "node build-docs-json.js && cp index-v2.html index.html"
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "."
+      }
+    }
+  ]
 }

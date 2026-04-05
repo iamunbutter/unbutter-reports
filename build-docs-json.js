@@ -9,6 +9,7 @@ const CATEGORY_CONFIG = {
   agents: { name: '에이전트', icon: '🤖', color: '#6366f1' },
   brand: { name: '브랜드', icon: '🧈', color: '#f59e0b' },
   marketing: { name: '마케팅', icon: '📢', color: '#ec4899' },
+  meta: { name: '메타광고', icon: '🎯', color: '#1877f2' },
   extensions: { name: '확장프로그램', icon: '🧩', color: '#10b981' },
   dashboard: { name: '대시보드', icon: '📊', color: '#3b82f6' },
   current: { name: '현황/태스크', icon: '✅', color: '#8b5cf6' },

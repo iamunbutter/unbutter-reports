@@ -488,7 +488,7 @@
     // docs.json 로드 후 초기화
     async function init() {
       try {
-        const response = await fetch('/docs.json');
+        const response = await fetch('./docs.json');
         if (!response.ok) throw new Error('docs.json 로드 실패');
         docsData = await response.json();
 

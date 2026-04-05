@@ -54,7 +54,8 @@ function walkDir(dir, category = '') {
         title: extractTitle(content, file),
         description: extractDescription(content),
         content: content,
-        size: Buffer.byteLength(content, 'utf-8')
+        size: Buffer.byteLength(content, 'utf-8'),
+        lastModified: stat.mtimeMs
       };
     }
   });

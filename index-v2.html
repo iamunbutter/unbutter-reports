@@ -538,12 +538,13 @@
           title: doc.title || key.split('/').pop().replace('.md', ''),
           description: doc.description || '',
           size: doc.size || 0,
-          path: doc.path
+          path: doc.path,
+          lastModified: doc.lastModified || 0
         };
       });
 
-      // 제목순 정렬
-      documents.sort((a, b) => a.title.localeCompare(b.title, 'ko'));
+      // 최신 문서가 위로 오도록 수정일 역순 정렬
+      documents.sort((a, b) => b.lastModified - a.lastModified);
     }
 
     function renderCategories() {
